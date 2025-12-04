@@ -1,0 +1,55 @@
+/* PrimeReact Theme Customization */
+/* Import PrimeReact base styles */
+@import 'primereact/resources/themes/lara-light-blue/theme.css';
+@import 'primereact/resources/primereact.min.css';
+@import 'primeicons/primeicons.css';
+
+/* Custom overrides for better integration with Tailwind */
+.p-component {
+  font-family: inherit;
+}
+
+.p-button {
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.p-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.p-dialog .p-dialog-header {
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  color: white;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.p-dialog .p-dialog-header .p-dialog-title {
+  color: white;
+  font-weight: 600;
+}
+
+.p-dialog .p-dialog-header .p-dialog-header-icon {
+  color: white;
+}
+
+.p-inputtext:focus,
+.p-dropdown:not(.p-disabled).p-focus,
+.p-calendar:not(.p-disabled).p-focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.2);
+}
+
+.p-toast {
+  z-index: 9999;
+}
+

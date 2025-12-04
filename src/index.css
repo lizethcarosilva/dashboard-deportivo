@@ -1,0 +1,914 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #06b6d4;
+  --primary-600: #0891b2;
+  --primary-700: #0e7490;
+  --primary-800: #155e75;
+  --primary-900: #164e63;
+  
+  --sport-soccer: #10b981;
+  --sport-basketball: #f59e0b;
+  --sport-tennis: #ef4444;
+  --sport-swimming: #06b6d4;
+  --sport-athletics: #8b5cf6;
+  
+  --cyber-cyan: #06b6d4;
+  --cyber-purple: #a855f7;
+  --cyber-bg: #030712;
+  --cyber-bg-secondary: #0c0a1d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #030712 0%, #0c0a1d 100%);
+  background-attachment: fixed;
+  color: #fff;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Cyberpunk Estilos PrimeReact */
+.p-card {
+  background: rgba(3, 7, 18, 0.85);
+  border: 2px solid rgba(6, 182, 212, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+  backdrop-filter: blur(15px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.p-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, transparent 50%, rgba(168, 85, 247, 0.05) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.p-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.p-card:hover {
+  border-color: rgba(6, 182, 212, 0.5);
+  box-shadow: 0 0 40px rgba(6, 182, 212, 0.2), 0 0 60px rgba(168, 85, 247, 0.1);
+  transform: translateY(-2px);
+}
+
+.p-datatable {
+  background: rgba(3, 7, 18, 0.85);
+  border: 2px solid rgba(6, 182, 212, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: blur(15px);
+}
+
+.p-datatable .p-datatable-wrapper {
+  background: transparent;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.3);
+  font-size: 0.875rem;
+  height: 45px;
+}
+
+.p-datatable .p-datatable-tbody > tr {
+  background: rgba(12, 10, 29, 0.6);
+  color: #e5e7eb;
+  transition: all 0.2s;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: rgba(6, 182, 212, 0.15);
+  box-shadow: inset 0 0 20px rgba(6, 182, 212, 0.15);
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  border-bottom: 1px solid rgba(6, 182, 212, 0.1);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  height: 45px;
+}
+
+.p-datatable .p-datatable-tbody > tr > td .p-button {
+  height: 30px;
+  padding: 0 0.75rem;
+}
+
+.p-datatable .p-datatable-tbody > tr > td .p-button.p-button-rounded {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+}
+
+.p-dialog {
+  background: rgba(3, 7, 18, 0.98);
+  border: 2px solid rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 60px rgba(6, 182, 212, 0.4), 0 0 100px rgba(168, 85, 247, 0.3);
+  backdrop-filter: blur(25px);
+}
+
+.p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(168, 85, 247, 0.25) 100%);
+  color: #06b6d4;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 12px 12px 0 0;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+}
+
+.p-dialog .p-dialog-header .p-dialog-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 1.5rem;
+  background: rgba(12, 10, 29, 0.8);
+  color: #e5e7eb;
+}
+
+.p-dialog .p-dialog-footer {
+  background: rgba(12, 10, 29, 0.8);
+  border-top: 1px solid rgba(6, 182, 212, 0.2);
+  padding: 1rem 1.5rem;
+}
+
+.p-button.p-button-rounded  {
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  height: 35px;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem;
+}
+
+.p-button .p-button-icon {
+  font-size: 1rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 0 !important;
+}
+
+.p-button .p-button-label {
+  line-height: 1;
+  font-weight: 600;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 35px !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 10px !important;
+}
+
+/* Botones solo con icono - Centrado perfecto */
+.p-button.p-button-icon-only {
+  width: 35px !important;
+  height: 35px !important;
+  min-width: 35px !important;
+  min-height: 35px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+.p-button.p-button-icon-only .p-button-icon {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.p-button.p-button-icon-only .p-button-label {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Botones rounded - Centrado perfecto */
+.p-button.p-button-rounded {
+  border-radius: 50% !important;
+  width: 35px !important;
+  height: 35px !important;
+  min-width: 35px !important;
+  min-height: 35px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+.p-button.p-button-rounded .p-button-icon {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.p-button.p-button-rounded .p-button-label {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Botones pequeños */
+.p-button.p-button-sm {
+  height: 30px;
+  padding: 0 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.p-button.p-button-sm.p-button-icon-only,
+.p-button.p-button-sm.p-button-rounded {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.p-button.p-button-sm.p-button-icon-only .p-button-icon,
+.p-button.p-button-sm.p-button-rounded .p-button-icon {
+  width: auto !important;
+  height: auto !important;
+}
+
+.p-button.p-button-sm.p-button-icon-only .p-button-label,
+.p-button.p-button-sm.p-button-rounded .p-button-label {
+  display: none !important;
+}
+
+/* Forzar centrado en iconos PrimeIcons */
+.p-button .pi {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Eliminar todo espaciado en botones icon-only/rounded */
+.p-button-icon-only > *,
+.p-button-rounded > * {
+  margin: 0 !important;
+}
+
+.p-button-icon-only .p-button-icon > *,
+.p-button-rounded .p-button-icon > * {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.p-button:not(.p-button-outlined):not(.p-button-text) {
+  background: linear-gradient(135deg, #06b6d4 0%, #a855f7 100%);
+  border: none;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+.p-button:not(.p-button-outlined):not(.p-button-text):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.5), 0 0 40px rgba(168, 85, 247, 0.3);
+}
+
+.p-button-outlined {
+  border: 2px solid rgba(6, 182, 212, 0.5);
+  color: #06b6d4;
+  background: transparent;
+}
+
+.p-button-outlined:hover {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: #06b6d4;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+.p-inputtext,
+.p-dropdown,
+.p-calendar,
+.p-inputnumber-input,
+.p-multiselect {
+  background: rgba(12, 10, 29, 0.8);
+  border: 2px solid rgba(6, 182, 212, 0.3);
+  border-radius: 8px;
+  color: #e5e7eb;
+  transition: all 0.2s;
+  height: 35px;
+  min-height: 35px;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  line-height: 31px;
+}
+
+.p-dropdown,
+.p-calendar,
+.p-multiselect {
+  display: flex;
+  align-items: center;
+}
+
+.p-inputnumber {
+  height: 35px;
+}
+
+.p-inputnumber-input {
+  height: 35px !important;
+  padding: 0 0.75rem !important;
+}
+
+.p-inputtext::placeholder {
+  color: rgba(229, 231, 235, 0.4);
+}
+
+.p-inputtext:focus,
+.p-dropdown:not(.p-disabled).p-focus,
+.p-calendar:not(.p-disabled).p-focus,
+.p-inputnumber:not(.p-disabled).p-focus .p-inputnumber-input,
+.p-multiselect:not(.p-disabled).p-focus {
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25), 0 0 20px rgba(6, 182, 212, 0.2);
+  background: rgba(6, 182, 212, 0.08);
+}
+
+.p-dropdown-panel,
+.p-multiselect-panel,
+.p-calendar-panel {
+  background: rgba(3, 7, 18, 0.98);
+  border: 2px solid rgba(6, 182, 212, 0.4);
+  backdrop-filter: blur(25px);
+  box-shadow: 0 0 40px rgba(6, 182, 212, 0.4);
+}
+
+.p-dropdown .p-dropdown-trigger,
+.p-multiselect .p-multiselect-trigger {
+  width: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-calendar .p-datepicker-trigger {
+  width: 35px;
+  height: 33px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-dropdown-item,
+.p-multiselect-item {
+  color: #e5e7eb;
+  transition: all 0.2s;
+  background: transparent;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+}
+
+.p-dropdown-item:hover,
+.p-multiselect-item:hover {
+  background: rgba(6, 182, 212, 0.2);
+  color: #06b6d4;
+}
+
+.p-dropdown-item.p-highlight,
+.p-multiselect-item.p-highlight {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%);
+  color: #06b6d4;
+}
+
+/* Calendar específico */
+.p-datepicker {
+  background: rgba(3, 7, 18, 0.98);
+  color: #e5e7eb;
+  font-size: 0.875rem;
+}
+
+.p-datepicker .p-datepicker-header {
+  background: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.3);
+  padding: 0.5rem;
+}
+
+.p-datepicker .p-datepicker-header .p-datepicker-prev,
+.p-datepicker .p-datepicker-header .p-datepicker-next {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-datepicker .p-datepicker-title {
+  line-height: 30px;
+}
+
+.p-datepicker table {
+  font-size: 0.875rem;
+}
+
+.p-datepicker table td {
+  padding: 0.25rem;
+}
+
+.p-datepicker table td > span {
+  color: #e5e7eb;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-datepicker table td > span:hover {
+  background: rgba(6, 182, 212, 0.2);
+  color: #06b6d4;
+}
+
+.p-datepicker table td.p-datepicker-today > span {
+  background: rgba(168, 85, 247, 0.3);
+  color: #a855f7;
+}
+
+.p-datepicker table td > span.p-highlight {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.4) 0%, rgba(168, 85, 247, 0.4) 100%);
+  color: #06b6d4;
+}
+
+.p-datepicker .p-monthpicker-month,
+.p-datepicker .p-yearpicker-year {
+  height: 30px;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Animaciones Cyberpunk */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(6, 182, 212, 0.5), 0 0 60px rgba(168, 85, 247, 0.3);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.cyber-glow {
+  animation: glow 3s ease-in-out infinite;
+}
+
+/* Responsiveness mejorado */
+@media (max-width: 768px) {
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .p-dialog {
+    width: 95vw !important;
+    margin: 0.5rem;
+  }
+  
+  .p-card {
+    border-radius: 8px;
+  }
+}
+
+/* Scrollbar Cyberpunk */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(3, 7, 18, 0.5);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #06b6d4 0%, #a855f7 100%);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #0891b2 0%, #9333ea 100%);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.8);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(6, 182, 212, 0.1);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #06b6d4, #a855f7);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #0891b2, #9333ea);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.8);
+}
+
+/* Efectos adicionales */
+.glass-effect {
+  background: rgba(3, 7, 18, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.cyber-border {
+  border: 2px solid rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+}
+
+.cyber-text-glow {
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+/* Toast messages */
+.p-toast .p-toast-message {
+  background: rgba(3, 7, 18, 0.98);
+  border: 2px solid rgba(6, 182, 212, 0.4);
+  backdrop-filter: blur(25px);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
+  color: #e5e7eb;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+.p-toast .p-toast-message .p-toast-message-content {
+  padding: 0;
+}
+
+.p-toast .p-toast-message .p-toast-message-icon {
+  font-size: 1.25rem;
+}
+
+.p-toast .p-toast-message .p-toast-summary {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.p-toast .p-toast-message .p-toast-detail {
+  font-size: 0.875rem;
+}
+
+.p-toast .p-toast-message.p-toast-message-success {
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+}
+
+.p-toast .p-toast-message.p-toast-message-error {
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+}
+
+.p-toast .p-toast-message.p-toast-message-info {
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
+}
+
+/* Confirm Dialog */
+.p-confirm-dialog {
+  background: rgba(3, 7, 18, 0.98);
+  border: 2px solid rgba(6, 182, 212, 0.4);
+  backdrop-filter: blur(25px);
+  box-shadow: 0 0 60px rgba(6, 182, 212, 0.4);
+}
+
+.p-confirm-dialog .p-dialog-header {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(168, 85, 247, 0.25) 100%);
+  border-bottom: 1px solid rgba(6, 182, 212, 0.3);
+  color: #06b6d4;
+  padding: 1rem 1.5rem;
+}
+
+.p-confirm-dialog .p-dialog-content {
+  background: rgba(12, 10, 29, 0.8);
+  color: #e5e7eb;
+  padding: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.p-confirm-dialog .p-dialog-footer {
+  background: rgba(12, 10, 29, 0.8);
+  border-top: 1px solid rgba(6, 182, 212, 0.2);
+  padding: 1rem 1.5rem;
+}
+
+/* Paginator */
+.p-paginator {
+  background: rgba(3, 7, 18, 0.6);
+  color: #e5e7eb;
+  border-top: 1px solid rgba(6, 182, 212, 0.2);
+  padding: 0.5rem 0.75rem;
+}
+
+.p-paginator .p-paginator-page,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-last {
+  color: #e5e7eb;
+  background: transparent;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  min-width: 35px;
+  height: 35px;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-paginator .p-paginator-page:hover,
+.p-paginator .p-paginator-next:hover,
+.p-paginator .p-paginator-prev:hover,
+.p-paginator .p-paginator-first:hover,
+.p-paginator .p-paginator-last:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: #06b6d4;
+}
+
+.p-paginator .p-paginator-page.p-highlight {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%);
+  border-color: #06b6d4;
+  color: #06b6d4;
+}
+
+.p-paginator .p-dropdown {
+  height: 35px;
+  margin: 0 0.5rem;
+}
+
+/* TabView Cyberpunk */
+.p-tabview {
+  background: transparent;
+}
+
+.p-tabview .p-tabview-nav {
+  background: rgba(3, 7, 18, 0.6);
+  border: 2px solid rgba(6, 182, 212, 0.3);
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  backdrop-filter: blur(10px);
+}
+
+.p-tabview .p-tabview-nav li {
+  margin-right: 0;
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  background: transparent;
+  border: none;
+  color: #e5e7eb;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s;
+  border-bottom: 2px solid transparent;
+  font-size: 0.875rem;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link:hover {
+  background: rgba(6, 182, 212, 0.1);
+  color: #06b6d4;
+}
+
+.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
+  color: #06b6d4;
+  border-bottom-color: #06b6d4;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+.p-tabview .p-tabview-panels {
+  background: transparent;
+  border: 2px solid rgba(6, 182, 212, 0.3);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+/* Card titles */
+.p-card .p-card-title {
+  color: #06b6d4;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+.p-card .p-card-content {
+  color: #e5e7eb;
+}
+
+.p-card .p-card-subtitle {
+  color: #a855f7;
+}
+
+/* Charts responsive */
+.p-chart {
+  position: relative;
+  width: 100%;
+}
+
+.p-chart canvas {
+  max-width: 100%;
+  height: auto !important;
+  min-height: 300px !important;
+}
+
+/* MultiSelect Chips */
+.p-multiselect-token {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.5);
+  padding: 0.25rem 0.5rem;
+  margin: 0.125rem;
+  font-size: 0.8125rem;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.p-multiselect-token .p-multiselect-token-label {
+  line-height: 1;
+}
+
+.p-multiselect-token .p-multiselect-token-icon {
+  color: #06b6d4;
+}
+
+.p-multiselect-token:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.4) 0%, rgba(168, 85, 247, 0.4) 100%);
+}
+
+/* Checkbox */
+.p-checkbox .p-checkbox-box {
+  background: rgba(12, 10, 29, 0.8);
+  border: 2px solid rgba(6, 182, 212, 0.3);
+  color: #06b6d4;
+  width: 20px;
+  height: 20px;
+}
+
+.p-checkbox .p-checkbox-box .p-checkbox-icon {
+  font-size: 0.875rem;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%);
+  border-color: #06b6d4;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+  border-color: #06b6d4;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+/* Ajustes adicionales para inputs */
+.p-inputtext::placeholder {
+  font-size: 0.875rem;
+}
+
+.p-dropdown-label,
+.p-multiselect-label {
+  padding: 0;
+  line-height: 31px;
+  font-size: 0.875rem;
+}
+
+.p-multiselect-label-container {
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.p-calendar-w-btn .p-inputtext {
+  border-radius: 8px 0 0 8px;
+}
+
+.p-calendar-w-btn .p-datepicker-trigger {
+  border-radius: 0 8px 8px 0;
+  height: 35px;
+}
+
+/* Ajustar espacio entre label e input */
+label + .p-inputtext,
+label + .p-dropdown,
+label + .p-calendar,
+label + .p-multiselect,
+label + .p-inputnumber {
+  margin-top: 0.25rem;
+}
+
+/* Iconos de inputs */
+.p-input-icon-left > i:first-of-type,
+.p-input-icon-right > i:last-of-type {
+  font-size: 1rem;
+  line-height: 35px;
+}
+
+.p-input-icon-left > .p-inputtext {
+  padding-left: 2.5rem;
+}
+
+.p-input-icon-right > .p-inputtext {
+  padding-right: 2.5rem;
+}
