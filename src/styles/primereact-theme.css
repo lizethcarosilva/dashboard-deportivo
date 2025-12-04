@@ -53,3 +53,135 @@
   z-index: 9999;
 }
 
+/* Responsive TabView - Mobile Fix */
+.p-tabview {
+  width: 100%;
+  overflow: hidden;
+}
+
+.p-tabview-nav-container {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.p-tabview-nav {
+  flex-wrap: nowrap;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.p-tabview-nav li {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.p-tabview-nav li a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-content: center;
+  font-size: 0.875rem;
+  padding: 0.75rem 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .p-tabview-nav li a {
+    font-size: 0.75rem;
+    padding: 0.75rem 0.25rem;
+  }
+  
+  .p-tabview-nav li a .p-menuitem-icon {
+    margin-right: 0.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+.p-tabview-panels {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.p-tabview-panel {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Responsive DataTable - Mobile Fix */
+@media (max-width: 768px) {
+  .p-datatable {
+    font-size: 0.875rem;
+  }
+  
+  .p-datatable .p-datatable-thead > tr > th {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .p-paginator {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+  
+  .p-paginator .p-paginator-pages {
+    flex-wrap: wrap;
+  }
+  
+  .p-paginator button {
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: 0.25rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* ============================================
+   EVITAR OVERFLOW HORIZONTAL EN TODOS LOS COMPONENTES
+   ============================================ */
+.p-card,
+.p-card-content,
+.p-card-body {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Forzar que el DataTable respete el ancho del contenedor */
+.p-datatable-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.p-datatable {
+  width: 100%;
+  max-width: 100%;
+  table-layout: auto;
+}
+
+.p-datatable table {
+  min-width: 100%;
+}
+
+/* Asegurar que las columnas sean responsivas */
+@media (max-width: 768px) {
+  .p-datatable .p-column-title {
+    display: block;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+}
+
+/* Forzar box-sizing en todos los elementos de PrimeReact */
+.p-component,
+.p-component * {
+  box-sizing: border-box;
+}
+

@@ -25,9 +25,32 @@
   z-index: 1;
 }
 
+/* Efecto en hover y focus (desktop) */
 .card-spotlight:hover::before,
 .card-spotlight:focus-within::before {
   opacity: 1;
+}
+
+/* Efecto en dispositivos táctiles (móvil/tablet) */
+.card-spotlight:active::before {
+  opacity: 0.8;
+}
+
+/* Animación suave en mobile para mejor experiencia táctil */
+@media (hover: none) and (pointer: coarse) {
+  .card-spotlight::before {
+    transition: opacity 0.2s ease;
+  }
+  
+  /* En mobile, mostrar un spotlight más suave al tocar */
+  .card-spotlight:active::before {
+    opacity: 0.7;
+    background: radial-gradient(
+      400px circle at var(--mouse-x) var(--mouse-y), 
+      var(--spotlight-color), 
+      transparent 50%
+    );
+  }
 }
 
 .card-spotlight > * {

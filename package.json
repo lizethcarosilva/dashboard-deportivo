@@ -7,14 +7,20 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node server.js",
+    "server:dev": "nodemon server.js"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
     "chart.js": "^4.5.1",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
     "framer-motion": "^12.23.25",
+    "gsap": "^3.13.0",
     "idb": "^8.0.3",
     "lucide-react": "^0.555.0",
+    "multer": "^2.0.2",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.7",

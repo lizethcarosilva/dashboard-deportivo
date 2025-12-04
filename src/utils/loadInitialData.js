@@ -28,7 +28,7 @@ export const loadInitialData = async () => {
     const currentCoach = JSON.parse(localStorage.getItem('currentCoach') || '{"id": 1}');
     const coachId = currentCoach.id || 1;
 
-    // Datos de deportistas - ÚNICOS (3 por cada deporte = 15 total)
+    // Datos de deportistas - ÚNICOS (36 total: 8 fútbol, 8 baloncesto, 8 tenis, 7 atletismo, 5 natación)
     const athletesData = [
       // ⚽ FÚTBOL (3 deportistas)
       {
@@ -174,6 +174,215 @@ export const loadInitialData = async () => {
         coachId,
         createdAt: new Date().toISOString(),
       },
+
+      // ⚽ FÚTBOL - Adicionales (2 más)
+      {
+        fullName: 'Erling Haaland',
+        sport: 'futbol',
+        age: 23,
+        country: 'Noruega',
+        photoUrl: '',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Neymar Jr',
+        sport: 'futbol',
+        age: 31,
+        country: 'Brasil',
+        photoUrl: '',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+
+      // 🏀 BALONCESTO - Adicionales (2 más)
+      {
+        fullName: 'Giannis Antetokounmpo',
+        sport: 'baloncesto',
+        age: 29,
+        country: 'Grecia',
+        photoUrl: '',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Kevin Durant',
+        sport: 'baloncesto',
+        age: 35,
+        country: 'Estados Unidos',
+        photoUrl: '',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+
+      // 🎾 TENIS - Adicionales (2 más)
+      {
+        fullName: 'Jannik Sinner',
+        sport: 'tenis',
+        age: 22,
+        country: 'Italia',
+        photoUrl: '',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Daniil Medvedev',
+        sport: 'tenis',
+        age: 27,
+        country: 'Rusia',
+        photoUrl: '',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+
+      // 🏃 ATLETISMO - Adicionales (2 más)
+      {
+        fullName: 'Sydney McLaughlin',
+        sport: 'atletismo',
+        age: 24,
+        country: 'Estados Unidos',
+        photoUrl: '',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Armand Duplantis',
+        sport: 'atletismo',
+        age: 24,
+        country: 'Suecia',
+        photoUrl: '',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+
+      // 🏊 NATACIÓN - Adicional (1 más)
+      {
+        fullName: 'Adam Peaty',
+        sport: 'natacion',
+        age: 29,
+        country: 'Reino Unido',
+        photoUrl: '',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+
+      // ⚽ FÚTBOL - Deportistas Latinoamericanos (3)
+      {
+        fullName: 'Luis Martínez',
+        sport: 'futbol',
+        age: 24,
+        country: 'Colombia',
+        photoUrl: '/jugadores/luis-martinez.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Andrés Ramírez',
+        sport: 'futbol',
+        age: 27,
+        country: 'Argentina',
+        photoUrl: '/jugadores/andres-ramirez.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Mateo González',
+        sport: 'futbol',
+        age: 22,
+        country: 'México',
+        photoUrl: '/jugadores/mateo-gonzalez.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+
+      // 🏀 BALONCESTO - Deportistas Internacionales (3)
+      {
+        fullName: 'Carlos Herrera',
+        sport: 'baloncesto',
+        age: 29,
+        country: 'España',
+        photoUrl: '/jugadores/carlos-herrera.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Samuel López',
+        sport: 'baloncesto',
+        age: 25,
+        country: 'Colombia',
+        photoUrl: '/jugadores/samuel-lopez.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Thiago Alves',
+        sport: 'baloncesto',
+        age: 31,
+        country: 'Brasil',
+        photoUrl: '/jugadores/thiago-alves.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+
+      // 🎾 TENIS - Deportistas Internacionales (3)
+      {
+        fullName: 'Hiroshi Tanaka',
+        sport: 'tenis',
+        age: 26,
+        country: 'Japón',
+        photoUrl: '/jugadores/hiroshi-tanaka.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Daniel Smith',
+        sport: 'tenis',
+        age: 23,
+        country: 'Estados Unidos',
+        photoUrl: '/jugadores/daniel-smith.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Ethan Brown',
+        sport: 'tenis',
+        age: 28,
+        country: 'Canadá',
+        photoUrl: '/jugadores/ethan-brown.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+
+      // 🏃 ATLETISMO - Mujeres (2)
+      {
+        fullName: 'Kenia Duarte',
+        sport: 'atletismo',
+        age: 21,
+        country: 'México',
+        photoUrl: '/jugadores/kenia-duarte.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        fullName: 'Laura Sánchez',
+        sport: 'atletismo',
+        age: 25,
+        country: 'Colombia',
+        photoUrl: '/jugadores/laura-sanchez.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
+
+      // 🏊 NATACIÓN - Mujeres (1)
+      {
+        fullName: 'Sofía Rivas',
+        sport: 'natacion',
+        age: 20,
+        country: 'Argentina',
+        photoUrl: '/jugadores/sofia-rivas.png',
+        coachId,
+        createdAt: new Date().toISOString(),
+      },
     ];
 
     // Función para generar registros según el deporte
@@ -263,12 +472,12 @@ export const loadInitialData = async () => {
     console.log('🎉 ¡Datos cargados exitosamente!');
     console.log(`📋 Total deportistas: ${athletesData.length}`);
     console.log(`📊 Total registros: ${totalRecords}`);
-    console.log('⚽ Fútbol: 3 deportistas');
-    console.log('🏀 Baloncesto: 3 deportistas');
-    console.log('🎾 Tenis: 3 deportistas');
-    console.log('🏃 Atletismo: 3 deportistas');
-    console.log('🏊 Natación: 3 deportistas');
-    console.log('✅ Total: 15 deportistas únicos (SIN DUPLICADOS)');
+    console.log('⚽ Fútbol: 8 deportistas');
+    console.log('🏀 Baloncesto: 8 deportistas');
+    console.log('🎾 Tenis: 8 deportistas');
+    console.log('🏃 Atletismo: 7 deportistas');
+    console.log('🏊 Natación: 5 deportistas');
+    console.log('✅ Total: 36 deportistas únicos (SIN DUPLICADOS)');
     
     return true;
   } catch (error) {

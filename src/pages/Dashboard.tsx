@@ -44,6 +44,10 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const toast = React.useRef<any>(null);
 
+  // Estados para comparación
+  const [comparisonSport, setComparisonSport] = useState<string>('');
+  const [comparisonCountry, setComparisonCountry] = useState<string>('');
+
   // Estados para CRUD de Deportistas
   const [athleteDialogVisible, setAthleteDialogVisible] = useState(false);
   const [selectedAthlete, setSelectedAthlete] = useState<any>(null);
@@ -87,6 +91,17 @@ const Dashboard = () => {
     { label: 'Alemania', value: 'Alemania' },
     { label: 'Italia', value: 'Italia' },
     { label: 'Portugal', value: 'Portugal' },
+    { label: 'Noruega', value: 'Noruega' },
+    { label: 'Grecia', value: 'Grecia' },
+    { label: 'Rusia', value: 'Rusia' },
+    { label: 'Kenia', value: 'Kenia' },
+    { label: 'Suecia', value: 'Suecia' },
+    { label: 'Reino Unido', value: 'Reino Unido' },
+    { label: 'Jamaica', value: 'Jamaica' },
+    { label: 'Serbia', value: 'Serbia' },
+    { label: 'Eslovenia', value: 'Eslovenia' },
+    { label: 'Japón', value: 'Japón' },
+    { label: 'Canadá', value: 'Canadá' },
   ];
 
   // Campos específicos por deporte
@@ -203,6 +218,154 @@ const Dashboard = () => {
     setFilteredAthletes(filtered);
   };
 
+  // Funciones para comparación
+  const getAvailableSports = () => {
+    const uniqueSports = [...new Set(athletes.map(a => a.sport))];
+    return sports.filter(s => uniqueSports.includes(s.value));
+  };
+
+  const getAvailableCountries = () => {
+    const uniqueCountries = [...new Set(athletes.map(a => a.country))];
+    return countries.filter(c => uniqueCountries.includes(c.value));
+  };
+
+  const getComparisonAthletes = () => {
+    return athletes.filter(athlete => {
+      const matchSport = !comparisonSport || athlete.sport === comparisonSport;
+      const matchCountry = !comparisonCountry || athlete.country === comparisonCountry;
+      return matchSport && matchCountry;
+    });
+  };
+
+  const calculateAthleteScore = (athleteId: number, sport: string) => {
+    const records = sportRecords.filter(r => Number(r.athleteId) === athleteId);
+    if (records.length === 0) return 0;
+
+    const fields = getSportFields(sport);
+    let totalScore = 0;
+
+    records.forEach(record => {
+      fields.forEach(field => {
+        const value = parseFloat(record[field.name]) || 0;
+        if (field.name === 'mejorTiempo') {
+          // Para tiempos, menor es mejor, así que invertimos
+          totalScore += value > 0 ? 100 / value : 0;
+        } else if (field.name.includes('Perdidos')) {
+          // Los valores negativos restan
+          totalScore -= value;
+        } else {
+          totalScore += value;
+        }
+      });
+    });
+
+    return totalScore;
+  };
+
+  const getAthleteAverageStats = (athleteId: number, sport: string) => {
+    const records = sportRecords.filter(r => Number(r.athleteId) === athleteId);
+    if (records.length === 0) return null;
+
+    const fields = getSportFields(sport);
+    const stats: any = {};
+
+    fields.forEach(field => {
+      const values = records
+        .map(r => parseFloat(r[field.name]))
+        .filter(v => !isNaN(v) && v !== null && v !== undefined);
+      
+      if (values.length > 0) {
+        const sum = values.reduce((acc, val) => acc + val, 0);
+        stats[field.name] = {
+          label: field.label,
+          average: sum / values.length,
+          total: sum,
+          count: values.length
+        };
+      } else {
+        stats[field.name] = {
+          label: field.label,
+          average: 0,
+          total: 0,
+          count: 0
+        };
+      }
+    });
+
+    return stats;
+  };
+
+  const getTopAthlete = (): any => {
+    const comparisonAthletes = getComparisonAthletes();
+    if (comparisonAthletes.length === 0 || !comparisonSport) return null;
+
+    let topAthlete: any = null;
+    let maxScore = -Infinity;
+
+    // Evaluar entre TODOS los atletas filtrados (hasta 12 o más)
+    comparisonAthletes.forEach(athlete => {
+      const score = calculateAthleteScore(athlete.id, athlete.sport);
+      if (score > maxScore) {
+        maxScore = score;
+        const stats = getAthleteAverageStats(athlete.id, athlete.sport);
+        topAthlete = { 
+          ...athlete, 
+          score,
+          stats,
+          recordsCount: sportRecords.filter(r => Number(r.athleteId) === athlete.id).length
+        };
+      }
+    });
+
+    return topAthlete;
+  };
+
+  const getComparisonChartData = () => {
+    const comparisonAthletes = getComparisonAthletes();
+    if (comparisonAthletes.length === 0 || !comparisonSport) {
+      return {
+        labels: [],
+        datasets: []
+      };
+    }
+
+    const fields = getSportFields(comparisonSport);
+    const labels = comparisonAthletes.map(a => a.fullName);
+    
+    // Crear un dataset por cada métrica
+    const datasets = fields.map((field, idx) => {
+      const data = comparisonAthletes.map(athlete => {
+        const records = sportRecords.filter(r => Number(r.athleteId) === athlete.id);
+        if (records.length === 0) return 0;
+        
+        // Calcular promedio de la métrica
+        const total = records.reduce((sum, r) => sum + (parseFloat(r[field.name]) || 0), 0);
+        return total / records.length;
+      });
+
+      const colors = [
+        'rgba(6, 182, 212, 0.8)',   // cyan
+        'rgba(168, 85, 247, 0.8)',  // purple
+        'rgba(34, 197, 94, 0.8)',   // green
+        'rgba(251, 146, 60, 0.8)',  // orange
+        'rgba(239, 68, 68, 0.8)',   // red
+      ];
+
+      return {
+        label: field.label,
+        data: data,
+        backgroundColor: colors[idx % colors.length],
+        borderColor: colors[idx % colors.length].replace('0.8', '1'),
+        borderWidth: 2,
+      };
+    });
+
+    return {
+      labels,
+      datasets
+    };
+  };
+
   // CRUD de Deportistas
   const handleSaveAthlete = async () => {
     try {
@@ -298,33 +461,51 @@ const Dashboard = () => {
     setAthleteDialogVisible(true);
   };
 
-  // Función para convertir imagen a Base64
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Subir imagen al servidor
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      // Validar que sea imagen
-      if (!file.type.startsWith('image/')) {
-        toast.current?.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Por favor selecciona un archivo de imagen válido',
-        });
-        return;
-      }
+    if (!file) return;
 
-      // Validar tamaño (max 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        toast.current?.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'La imagen debe ser menor a 2MB',
-        });
-        return;
-      }
+    if (!file.type.startsWith('image/')) {
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Selecciona una imagen válida' });
+      return;
+    }
 
+    // Verificar que haya un nombre de jugador
+    if (!athleteFormData.fullName || athleteFormData.fullName.trim() === '') {
+      toast.current?.show({ 
+        severity: 'warn', 
+        summary: 'Advertencia', 
+        detail: 'Por favor ingresa el nombre del jugador primero' 
+      });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('photo', file);
+      formData.append('athleteName', athleteFormData.fullName); // Enviar nombre del jugador
+
+      const response = await fetch('http://localhost:3001/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.photoUrl) {
+        setAthleteFormData({ ...athleteFormData, photoUrl: data.photoUrl, photoBase64: '' });
+        toast.current?.show({ 
+          severity: 'success', 
+          summary: 'Éxito', 
+          detail: `Imagen guardada como: ${data.photoUrl}` 
+        });
+      }
+    } catch (error) {
+      // Fallback: guardar en base64
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAthleteFormData({ ...athleteFormData, photoBase64: reader.result as string });
+        setAthleteFormData({ ...athleteFormData, photoBase64: reader.result as string, photoUrl: '' });
       };
       reader.readAsDataURL(file);
     }
@@ -916,7 +1097,7 @@ const Dashboard = () => {
             {/* Header con foto y datos */}
             <div className="flex items-start gap-4 mb-6">
               {/* Foto del deportista */}
-              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${sportColors.bg} flex items-center justify-center text-4xl shadow-lg flex-shrink-0`}
+              <div className={`hidden md:flex w-20 h-20 rounded-2xl bg-gradient-to-br ${sportColors.bg} items-center justify-center text-4xl shadow-lg flex-shrink-0`}
                    style={{boxShadow: `0 0 20px ${sportColors.text.replace('text-', 'rgba(')}, 0.3)`}}>
                 {athlete.photoBase64 ? (
                   <img src={athlete.photoBase64} alt={athlete.fullName} className="w-full h-full object-cover rounded-2xl" />
@@ -976,7 +1157,7 @@ const Dashboard = () => {
 
             {/* Estadística principal */}
             {mainStat ? (
-              <div className="mb-4 relative overflow-hidden">
+              <div className="hidden md:block mb-4 relative overflow-hidden">
                 <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-cyan-500/20 rounded-xl p-6 relative backdrop-blur-sm">
                   <div className="absolute top-2 left-4 text-xs uppercase tracking-wider text-gray-400 font-semibold">
                     {mainStat.label}
@@ -992,7 +1173,7 @@ const Dashboard = () => {
                 </div>
               </div>
             ) : (
-              <div className="mb-4 bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-cyan-500/20 rounded-xl p-6 text-center">
+              <div className="hidden md:block mb-4 bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-cyan-500/20 rounded-xl p-6 text-center">
                 <p className="text-cyan-400/50">Sin registros</p>
               </div>
             )}
@@ -1034,7 +1215,7 @@ const Dashboard = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="pb-8"
+      className="pb-8 max-w-full overflow-x-hidden"
     >
       <Toast ref={toast} />
       <ConfirmDialog />
@@ -1055,7 +1236,7 @@ const Dashboard = () => {
               label="Agregar Deportista"
               icon="pi pi-plus"
               onClick={() => openAthleteDialog()}
-              className="min-h-[35px] bg-gradient-to-r from-cyan-500 to-purple-600 border-0 shadow-lg hover:shadow-xl transition-shadow"
+              className="min-h-[35px] bg-gradient-to-r from-cyan-500 to-purple-600 border-0 shadow-lg hover:shadow-xl transition-shadow p-[5px]"
             />
           </div>
         </div>
@@ -1088,9 +1269,10 @@ const Dashboard = () => {
       </div>
 
       {/* Tabs de Contenido */}
-      <TabView activeIndex={activeTab} onTabChange={(e) => setActiveTab(e.index)}>
-        {/* Tab 1: Vista General */}
-        <TabPanel header=" Vista General" leftIcon="pi pi-chart-bar mr-2">
+      <div className="w-full overflow-hidden">
+        <TabView activeIndex={activeTab} onTabChange={(e) => setActiveTab(e.index)} className="w-full">
+          {/* Tab 1: Vista General */}
+          <TabPanel header=" Vista General" leftIcon="pi pi-chart-bar mr-2">
           {/* Filtros */}
           <Card title="Filtros" className="mb-6 shadow-lg border-0">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1183,8 +1365,8 @@ const Dashboard = () => {
                 </div>
                 
                 {/* Selector de paginación */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-cyan-400/70">Por página:</span>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <span className="text-xs sm:text-sm text-cyan-400/70 whitespace-nowrap">Por página:</span>
                   {['9', '11', '13', '15'].map(num => (
                     <button
                       key={num}
@@ -1192,7 +1374,7 @@ const Dashboard = () => {
                         setPaginationMode(num as any);
                         setCurrentPage(0);
                       }}
-                      className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all min-h-[35px] ${
+                      className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all min-h-[30px] sm:min-h-[35px] min-w-[30px] sm:min-w-[40px] ${
                         paginationMode === num
                           ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-lg'
                           : 'bg-gray-900/50 text-cyan-400/70 border border-cyan-500/30 hover:border-cyan-500/50'
@@ -1221,20 +1403,20 @@ const Dashboard = () => {
 
                 {/* Paginación Manual */}
                 {filteredAthletes.length > parseInt(paginationMode) && (
-                  <div className="flex justify-center items-center gap-2 mt-6 pt-6 border-t border-cyan-500/20">
+                  <div className="flex flex-wrap justify-center items-center gap-1.5 sm:gap-2 mt-6 pt-6 border-t border-cyan-500/20">
                     <button
                       onClick={() => setCurrentPage(0)}
                       disabled={currentPage === 0}
-                      className="px-3 py-2 rounded-lg border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all min-h-[35px]"
+                      className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all min-h-[32px] sm:min-h-[35px]"
                     >
-                      <span className="text-sm">Primera</span>
+                      <span className="text-xs sm:text-sm">Primera</span>
                     </button>
                     <button
                       onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                       disabled={currentPage === 0}
-                      className="px-3 py-2 rounded-lg border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all min-h-[35px]"
+                      className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all min-h-[32px] sm:min-h-[35px]"
                     >
-                      <span className="text-sm">Anterior</span>
+                      <span className="text-xs sm:text-sm">Anterior</span>
                     </button>
                     
                     {/* Páginas */}
@@ -1242,7 +1424,7 @@ const Dashboard = () => {
                       <button
                         key={idx}
                         onClick={() => setCurrentPage(idx)}
-                        className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all min-h-[35px] ${
+                        className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all min-h-[32px] sm:min-h-[35px] min-w-[32px] sm:min-w-[35px] ${
                           currentPage === idx
                             ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white border-none'
                             : 'border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10'
@@ -1256,16 +1438,16 @@ const Dashboard = () => {
                     <button
                       onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredAthletes.length / parseInt(paginationMode)) - 1, prev + 1))}
                       disabled={currentPage >= Math.ceil(filteredAthletes.length / parseInt(paginationMode)) - 1}
-                      className="px-3 py-2 rounded-lg border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all min-h-[35px]"
+                      className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all min-h-[32px] sm:min-h-[35px]"
                     >
-                      <span className="text-sm">Siguiente</span>
+                      <span className="text-xs sm:text-sm">Siguiente</span>
                     </button>
                     <button
                       onClick={() => setCurrentPage(Math.ceil(filteredAthletes.length / parseInt(paginationMode)) - 1)}
                       disabled={currentPage >= Math.ceil(filteredAthletes.length / parseInt(paginationMode)) - 1}
-                      className="px-3 py-2 rounded-lg border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all min-h-[35px]"
+                      className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all min-h-[32px] sm:min-h-[35px]"
                     >
-                      <span className="text-sm">Última</span>
+                      <span className="text-xs sm:text-sm">Última</span>
                     </button>
                   </div>
                 )}
@@ -1292,14 +1474,16 @@ const Dashboard = () => {
         {/* Tab 2: Gestión de Deportistas */}
         <TabPanel header=" Deportistas" leftIcon="pi pi-users mr-2">
           <Card title="Lista de Deportistas" className="shadow-lg border-0">
-        <DataTable
-          value={filteredAthletes}
-          loading={loading}
-          paginator
-          rows={10}
-              emptyMessage="No hay deportistas registrados. Haz clic en 'Agregar Deportista' para comenzar."
-              className="p-datatable-gridlines"
-        >
+            <div className="w-full overflow-x-auto -mx-1 px-4 md:mx-0 md:px-0">
+              <DataTable
+                value={filteredAthletes}
+                loading={loading}
+                paginator
+                rows={10}
+                emptyMessage="No hay deportistas registrados. Haz clic en 'Agregar Deportista' para comenzar."
+                className="p-datatable-gridlines"
+                responsiveLayout="scroll"
+              >
               <Column field="fullName" header="Nombre Completo" sortable />
           <Column field="sport" header="Deporte" body={sportBodyTemplate} sortable />
               <Column field="age" header="Edad" sortable />
@@ -1319,34 +1503,37 @@ const Dashboard = () => {
                 }}
               />
               <Column header="Acciones" body={athleteActionBodyTemplate} style={{ width: '180px' }} />
-        </DataTable>
-      </Card>
+              </DataTable>
+            </div>
+          </Card>
         </TabPanel>
 
         {/* Tab 3: Registros Diarios */}
         <TabPanel header="Registros Diarios" leftIcon="pi pi-calendar mr-2">
           <Card title="Gestión de Registros" className="mb-6 shadow-lg border-0">
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-cyan-400/70">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 ">
+              <p className="text-cyan-400/70 text-sm sm:text-base">
                 Visualiza y gestiona todos los registros deportivos de tus atletas
               </p>
               <Button
                 label="Nuevo Registro"
                 icon="pi pi-plus"
                 onClick={() => openRecordDialog()}
-                className="bg-gradient-to-r from-cyan-500 to-purple-600 border-0 !text-center min-h-[35px]"
+                className="bg-gradient-to-r from-cyan-500 to-purple-600 border-0 !text-center min-h-[35px] whitespace-nowrap"
                 disabled={athletes.length === 0}
               />
             </div>
 
-            <DataTable
-              value={sportRecords}
-              loading={loading}
-              paginator
-              rows={15}
-              emptyMessage="No hay registros. Agrega registros desde las tarjetas de deportistas o el botón 'Nuevo Registro'."
-              className="p-datatable-gridlines"
-            >
+            <div className="w-full overflow-x-auto -mx-1 px-2 md:mx-0 md:px-0">
+              <DataTable
+                value={sportRecords}
+                loading={loading}
+                paginator
+                rows={15}
+                emptyMessage="No hay registros. Agrega registros desde las tarjetas de deportistas o el botón 'Nuevo Registro'."
+                className="p-datatable-gridlines"
+                responsiveLayout="scroll"
+              >
               <Column 
                 field="athleteId" 
                 header="Deportista" 
@@ -1376,9 +1563,254 @@ const Dashboard = () => {
               />
               <Column header="Acciones" body={recordActionBodyTemplate} style={{ width: '120px' }} />
             </DataTable>
-      </Card>
+          </div>
+        </Card>
+        </TabPanel>
+
+        {/* Tab 4: Comparación por Deporte y Nacionalidad */}
+        <TabPanel header="Comparación" leftIcon="pi pi-chart-line mr-2">
+          <Card title="Comparación por Deporte y Nacionalidad" className="mb-6 shadow-lg border-0">
+            <p className="text-cyan-400/70 mb-4 text-sm sm:text-base">
+              Compara el rendimiento de deportistas filtrando por deporte y nacionalidad
+            </p>
+
+            {/* Filtros */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-cyan-400 mb-2">
+                  Seleccionar Deporte
+                </label>
+                <Dropdown
+                  value={comparisonSport}
+                  onChange={(e) => setComparisonSport(e.value)}
+                  options={getAvailableSports()}
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Selecciona un deporte"
+                  className="w-full"
+                  showClear
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-cyan-400 mb-2">
+                  Seleccionar Nacionalidad (Opcional)
+                </label>
+                <Dropdown
+                  value={comparisonCountry}
+                  onChange={(e) => setComparisonCountry(e.value)}
+                  options={getAvailableCountries()}
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Todas las nacionalidades"
+                  className="w-full"
+                  showClear
+                />
+              </div>
+            </div>
+
+            {comparisonSport ? (
+              <>
+                {/* Jugador Destacado */}
+                {(() => {
+                  const topAthlete = getTopAthlete();
+                  const comparisonCount = getComparisonAthletes().length;
+                  
+                  return topAthlete && (
+                    <Card className="mb-6 bg-gradient-to-br from-cyan-500/10 to-purple-600/10 border border-cyan-500/30 shadow-xl">
+                      <div className="space-y-6">
+                        {/* Header del Jugador Destacado */}
+                        <div className="flex flex-col md:flex-row items-center gap-6 pb-6 border-b border-cyan-500/20">
+                          <div className="flex-shrink-0">
+                            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-4xl shadow-lg relative">
+                              <Award className="text-white" size={48} />
+                              <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center border-4 border-gray-900">
+                                <span className="text-xs font-bold text-gray-900">1°</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex-1 text-center md:text-left">
+                            <div className="flex items-center gap-2 justify-center md:justify-start mb-2">
+                              <h3 className="text-2xl font-bold text-cyan-400">
+                                🏆 Jugador Destacado
+                              </h3>
+                              <span className="text-xs px-2 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-400">
+                                Evaluado entre {comparisonCount} {comparisonCount === 1 ? 'jugador' : 'jugadores'}
+                              </span>
+                            </div>
+                            <p className="text-2xl font-bold text-white mb-3">
+                              {topAthlete.fullName}
+                            </p>
+                            <div className="flex flex-wrap gap-2 justify-center md:justify-start text-sm">
+                              <span className="px-3 py-1.5 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-400 font-semibold">
+                                {sports.find(s => s.value === topAthlete.sport)?.label}
+                              </span>
+                              <span className="px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 rounded-full text-purple-400 font-semibold">
+                                🌍 {topAthlete.country}
+                              </span>
+                              <span className="px-3 py-1.5 bg-orange-500/20 border border-orange-500/30 rounded-full text-orange-400 font-semibold">
+                                📊 {topAthlete.recordsCount} registro(s)
+                              </span>
+
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Estadísticas Detalladas */}
+                        <div>
+                          <h4 className="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            <TrendingUp size={20} />
+                            Estadísticas Promedio
+                          </h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {topAthlete.stats && Object.entries(topAthlete.stats).map(([key, stat]: [string, any]) => {
+                              // Colores diferentes para cada métrica
+                              const colors = [
+                                { bg: 'bg-blue-500/10', border: 'border-blue-500/40', text: 'text-blue-400', icon: 'bg-blue-500' },
+                                { bg: 'bg-purple-500/10', border: 'border-purple-500/40', text: 'text-purple-400', icon: 'bg-purple-500' },
+                                { bg: 'bg-green-500/10', border: 'border-green-500/40', text: 'text-green-400', icon: 'bg-green-500' },
+                                { bg: 'bg-orange-500/10', border: 'border-orange-500/40', text: 'text-orange-400', icon: 'bg-orange-500' },
+                                { bg: 'bg-pink-500/10', border: 'border-pink-500/40', text: 'text-pink-400', icon: 'bg-pink-500' },
+                                { bg: 'bg-cyan-500/10', border: 'border-cyan-500/40', text: 'text-cyan-400', icon: 'bg-cyan-500' },
+                              ];
+                              const colorIndex = Object.keys(topAthlete.stats).indexOf(key);
+                              const color = colors[colorIndex % colors.length];
+
+                              return (
+                                <div 
+                                  key={key}
+                                  className={`relative ${color.bg} border-2 ${color.border} rounded-xl p-4 backdrop-blur-sm transition-all hover:scale-105 hover:shadow-lg`}
+                                >
+                                  <div className="flex items-start justify-between mb-3">
+                                    <div className="flex-1">
+                                      <p className={`text-xs font-medium ${color.text} opacity-80 mb-1`}>
+                                        {stat.label}
+                                      </p>
+                                      <p className={`text-2xl font-bold ${color.text}`}>
+                                        {stat.average.toFixed(2)}
+                                      </p>
+                                    </div>
+                                    <div className={`w-10 h-10 ${color.icon} rounded-lg flex items-center justify-center shadow-lg`}>
+                                      <Activity className="text-white" size={20} />
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className={`${color.text} opacity-70`}>
+                                      Total: {stat.total.toFixed(2)}
+                                    </span>
+                                    <span className={`${color.text} opacity-70`}>
+                                      En {stat.count} registros
+                                    </span>
+                                  </div>
+                                  {/* Barra de progreso visual */}
+                                  <div className="mt-2 h-1 bg-gray-800 rounded-full overflow-hidden">
+                                    <div 
+                                      className={`h-full ${color.icon} rounded-full transition-all`}
+                                      style={{ 
+                                        width: `${Math.min((stat.average / Math.max(...Object.values(topAthlete.stats).map((s: any) => s.average))) * 100, 100)}%` 
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })()}
+
+                {/* Gráfico Comparativo */}
+                {getComparisonAthletes().length > 0 ? (
+                  <Card title="Comparación de Métricas" className="shadow-lg border-0">
+                    <div className="w-full overflow-x-auto">
+                      <div style={{ minHeight: '400px', height: '400px', minWidth: '300px' }}>
+                        <Chart 
+                          type="bar" 
+                          data={getComparisonChartData()} 
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                              legend: {
+                                position: 'top',
+                                labels: {
+                                  color: 'rgba(6, 182, 212, 0.8)',
+                                  font: {
+                                    size: 12
+                                  }
+                                }
+                              },
+                              title: {
+                                display: true,
+                                text: `Comparación de ${sports.find(s => s.value === comparisonSport)?.label}`,
+                                color: 'rgba(6, 182, 212, 1)',
+                                font: {
+                                  size: 16,
+                                  weight: 'bold'
+                                }
+                              }
+                            },
+                            scales: {
+                              x: {
+                                ticks: {
+                                  color: 'rgba(6, 182, 212, 0.7)',
+                                  font: {
+                                    size: 10
+                                  }
+                                },
+                                grid: {
+                                  color: 'rgba(6, 182, 212, 0.1)'
+                                }
+                              },
+                              y: {
+                                ticks: {
+                                  color: 'rgba(6, 182, 212, 0.7)',
+                                  font: {
+                                    size: 10
+                                  }
+                                },
+                                grid: {
+                                  color: 'rgba(6, 182, 212, 0.1)'
+                                }
+                              }
+                            }
+                          }} 
+                        />
+                      </div>
+                    </div>
+
+                    {/* Resumen de atletas filtrados */}
+                    <div className="mt-6 pt-6 border-t border-cyan-500/20">
+                      <p className="text-cyan-400/70 text-sm">
+                        Mostrando comparación de <strong className="text-cyan-400">{getComparisonAthletes().length}</strong> deportista(s)
+                        {comparisonCountry && (
+                          <span> de <strong className="text-cyan-400">{countries.find(c => c.value === comparisonCountry)?.label}</strong></span>
+                        )}
+                      </p>
+                    </div>
+                  </Card>
+                ) : (
+                  <div className="text-center py-12">
+                    <Users className="mx-auto text-cyan-400/50 mb-4" size={64} />
+                    <p className="text-cyan-400/70 text-lg">
+                      No hay deportistas que coincidan con los filtros seleccionados
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <Activity className="mx-auto text-cyan-400/50 mb-4" size={64} />
+                <p className="text-cyan-400/70 text-lg">
+                  Selecciona un deporte para comenzar la comparación
+                </p>
+              </div>
+            )}
+          </Card>
         </TabPanel>
       </TabView>
+      </div>
 
       {/* Dialog para Agregar/Editar Deportista */}
       <Dialog
@@ -1456,57 +1888,24 @@ const Dashboard = () => {
             />
           </div>
 
+          {/* Subir foto */}
           <div>
             <label className="block text-sm font-medium text-cyan-400 mb-2">
               Foto (opcional)
             </label>
-            
-            {/* Opciones de foto */}
-            <div className="space-y-3">
-              {/* Opción 1: Subir archivo */}
-              <div>
-                <label className="block text-xs text-purple-400/70 mb-1">Subir archivo (recomendado - se guarda en BD)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="w-full text-sm text-cyan-400/70 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-2 file:border-cyan-500/30 file:text-sm file:font-semibold file:bg-cyan-500/10 file:text-cyan-400 hover:file:bg-cyan-500/20 file:cursor-pointer cursor-pointer"
-                  style={{height: '35px'}}
-                />
-                <small className="text-cyan-400/50 mt-1 block">Máx. 2MB - JPG, PNG, GIF</small>
-              </div>
-
-              {/* Opción 2: URL */}
-              <div>
-                <label className="block text-xs text-purple-400/70 mb-1">O pegar URL de imagen</label>
-                <InputText
-                  value={athleteFormData.photoUrl}
-                  onChange={(e) => setAthleteFormData({ ...athleteFormData, photoUrl: e.target.value })}
-                  placeholder="https://ejemplo.com/foto.jpg"
-                  className="w-full"
-                />
-              </div>
-
-              {/* Preview */}
-              {(athleteFormData.photoBase64 || athleteFormData.photoUrl) && (
-                <div className="mt-2">
-                  <label className="block text-xs text-cyan-400/70 mb-2">Vista previa:</label>
-                  <img 
-                    src={athleteFormData.photoBase64 || athleteFormData.photoUrl} 
-                    alt="Preview" 
-                    className="w-20 h-20 object-cover rounded-lg border-2 border-cyan-500/30"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                      toast.current?.show({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'No se pudo cargar la imagen',
-                      });
-                    }}
-                  />
-                </div>
-              )}
-            </div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="w-full text-sm text-cyan-400/70 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/10 file:text-cyan-400 hover:file:bg-cyan-500/20 cursor-pointer"
+            />
+            {(athleteFormData.photoBase64 || athleteFormData.photoUrl) && (
+              <img
+                src={athleteFormData.photoBase64 || athleteFormData.photoUrl}
+                alt="Preview"
+                className="mt-2 w-20 h-20 object-cover rounded-lg border-2 border-cyan-500/30"
+              />
+            )}
           </div>
 
           <div className="flex justify-end space-x-2 pt-4 border-t border-cyan-500/30">
